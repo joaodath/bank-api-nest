@@ -140,13 +140,27 @@ export class BankclientService {
     }
   }
 
-  
   update(id: number, updateBankclientDto: UpdateBankclientDto) {
     return `This action updates a #${id} bankclient`;
   }
 
   remove(cpf: string) {
     const clientInfo = this.findClient(cpf);
-    return `This action removes a # bankclient`;
+    if (clientInfo) {
+      const indexInfo = bankClients.findIndex(
+        (client) => client.clientCPF == clientInfo.clientCPF,
+      );
+      bankClients.splice(indexInfo, 1);
+
+      const indexHistory = bankHistory.findIndex(
+        (client) => client.clientCPF == clientInfo.clientCPF,
+      );
+      bankHistory.splice(indexHistory, 1);
+      return { success: 'Client Removed' };
+    } else {
+      return {
+        error: 'Client not found',
+      };
+    }
   }
 }
