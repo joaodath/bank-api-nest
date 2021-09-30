@@ -135,7 +135,9 @@ export class BankclientService {
   findBalanceByCPFAndDate(cpf: string, date: string) {
     const clientHistory = this.findHistory(cpf);
     if (clientHistory) {
-      const clientHistoryByDate = clientHistory.operation.find((operation) => operation.operationDate === date);
+      const clientHistoryByDate = clientHistory.operation.find(
+        (operation) => operation.operationDate === date,
+      );
       if (clientHistoryByDate) {
         return clientHistoryByDate;
       } else {
