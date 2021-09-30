@@ -5,6 +5,7 @@ export class CreateBankclientDto {
   clientCPF: string;
   clientName: string;
   clientBalance: number;
+  openingDate: string;
 }
 
 export class CreateClientHistoryDto {

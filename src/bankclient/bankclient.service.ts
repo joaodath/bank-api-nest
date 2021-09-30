@@ -8,15 +8,28 @@ import {
 import { UpdateBankclientDto } from './dto/update-bankclient.dto';
 
 const bankClients = [
-  { clientCPF: '12345678901', clientName: 'João', clientBalance: 50 },
+  {
+    clientCPF: '12345678901',
+    clientName: 'João',
+    clientBalance: 50,
+    openingDate: '29-09-2021--13-14-52',
+  },
 ];
 
 const bankHistory = [
   {
     clientCPF: '12345678901',
     operation: [
-      { operation: 'deposit', value: 100 },
-      { operation: 'withdraw', value: 50 },
+      {
+        operation: 'deposit',
+        value: 100,
+        operationDate: '29-09-2021--13-14-52',
+      },
+      {
+        operation: 'withdraw',
+        value: 50,
+        operationDate: '29-09-2021--13-14-52',
+      },
     ],
   },
 ];
@@ -32,10 +45,25 @@ export class BankclientService {
     return bankHistory.find((history) => history.clientCPF == clientCPF);
   }
 
+  findDate() {
+    const dateNow = new Date(Date.now());
+    const dateFound =
+      dateNow.getDate() +
+      '-' +
+      (dateNow.getMonth() + 1) +
+      '-' +
+      dateNow.getFullYear() +
+      '--' +
+      dateNow.getHours() +
+      '-' +
+      dateNow.getMinutes() +
+      '-' +
+      dateNow.getSeconds();
+    return dateFound;
+  }
+
   createClient(createBankclientDto: CreateBankclientDto) {
-    const clientExists = bankClients.find(
-      (client) => client.clientCPF == createBankclientDto.clientCPF,
-    );
+    const clientExists = this.findClient(createBankclientDto.clientCPF);
     if (clientExists) {
       return {
         error: 'Client already exists',
@@ -47,7 +75,11 @@ export class BankclientService {
       const createClientHistoryDto: CreateClientHistoryDto = {
         clientCPF: createBankclientDto.clientCPF,
         operation: [
-          { operation: 'deposit', value: createBankclientDto.clientBalance },
+          {
+            operation: 'deposit',
+            value: createBankclientDto.clientBalance,
+            operationDate: this.findDate(),
+          },
         ],
       };
       bankHistory.push(createClientHistoryDto);
@@ -100,6 +132,24 @@ export class BankclientService {
     }
   }
 
+  findBalanceByCPFAndDate(cpf: string, date: string) {
+    const clientHistory = this.findHistory(cpf);
+    if (clientHistory) {
+      const clientHistoryByDate = clientHistory.operation.find((operation) => operation.operationDate === date);
+      if (clientHistoryByDate) {
+        return clientHistoryByDate;
+      } else {
+        return {
+          error: 'History not found using this date',
+        };
+      }
+    } else {
+      return {
+        error: 'Client not found',
+      };
+    }
+  }
+
   deposit(cpf: string, depositDto: depositDTO) {
     const clientInfo = this.findClient(cpf);
     if (clientInfo) {
@@ -108,6 +158,7 @@ export class BankclientService {
       clientHistory.operation.push({
         operation: 'deposit',
         value: depositDto.deposit,
+        operationDate: this.findDate(),
       });
       return this.findClient(cpf);
     } else {
@@ -126,6 +177,7 @@ export class BankclientService {
         clientHistory.operation.push({
           operation: 'withdraw',
           value: withdrawDto.withdraw,
+          operationDate: this.findDate(),
         });
         return this.findClient(cpf);
       } else {
@@ -140,8 +192,21 @@ export class BankclientService {
     }
   }
 
-  update(id: number, updateBankclientDto: UpdateBankclientDto) {
-    return `This action updates a #${id} bankclient`;
+  updateClient(cpf: string, updateBankclientDto: CreateBankclientDto) {
+    const clientExists = this.findClient(cpf);
+    if (clientExists) {
+      updateBankclientDto.clientBalance = clientExists.clientBalance;
+      updateBankclientDto.clientCPF = clientExists.clientCPF;
+      const clientIndex = bankClients.findIndex(
+        (client) => client.clientCPF === cpf,
+      );
+      bankClients[clientIndex] = updateBankclientDto;
+      return this.findClient(cpf);
+    } else {
+      return {
+        error: 'Client not found',
+      };
+    }
   }
 
   remove(cpf: string) {

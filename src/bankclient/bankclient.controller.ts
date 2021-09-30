@@ -1,6 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { BankclientService } from './bankclient.service';
-import { CreateBankclientDto, depositDTO, withdrawDTO } from './dto/create-bankclient.dto';
+import {
+  CreateBankclientDto,
+  depositDTO,
+  withdrawDTO,
+} from './dto/create-bankclient.dto';
 import { UpdateBankclientDto } from './dto/update-bankclient.dto';
 
 @Controller('bankclient')
@@ -32,9 +45,25 @@ export class BankclientController {
     return this.bankclientService.findBalanceByCPF(cpf);
   }
 
+  @Get(':cpf/balancehistory/:date')
+  findBalanceHistoryByDate(
+    @Param('cpf') cpf: string,
+    @Param('date') date: string,
+  ) {
+    return this.bankclientService.findBalanceByCPFAndDate(cpf, date);
+  }
+
   @Patch(':cpf/deposit')
   deposit(@Param('cpf') cpf: string, @Body() depositDto: depositDTO) {
     return this.bankclientService.deposit(cpf, depositDto);
+  }
+
+  @Put(':cpf/update')
+  update(
+    @Param('cpf') cpf: string,
+    @Body() updateBankclientDto: CreateBankclientDto,
+  ) {
+    return this.bankclientService.updateClient(cpf, updateBankclientDto);
   }
 
   @Patch(':cpf/withdraw')
