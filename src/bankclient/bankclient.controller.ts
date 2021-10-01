@@ -30,11 +30,6 @@ export class BankclientController {
     return this.bankclientService.findAll();
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.bankclientService.findOne(+id);
-  // }
-
   @Get(':cpf')
   findClientByCpf(@Param('cpf') cpf: string) {
     return this.bankclientService.findClientByCPF(cpf);
@@ -70,11 +65,6 @@ export class BankclientController {
   withdraw(@Param('cpf') cpf: string, @Body() withdrawDto: withdrawDTO) {
     return this.bankclientService.withdraw(cpf, withdrawDto);
   }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateBankclientDto: UpdateBankclientDto) {
-  //   return this.bankclientService.update(+id, updateBankclientDto);
-  // }
 
   @Delete(':cpf')
   remove(@Param('cpf') cpf: string) {
